@@ -1,0 +1,2 @@
+tgtoken = ''
+adminid = ''
