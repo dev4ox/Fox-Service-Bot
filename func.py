@@ -10,7 +10,7 @@ import datetime
 
 
 def first_join(user_id, name, code):
-    conn = sqlite3.connect('base_ts.sqlite')
+    conn = sqlite3.connect(key.db)
     cursor = conn.cursor()
     row = cursor.execute(f'SELECT * FROM users WHERE user_id = "{user_id}"').fetchall()
 
@@ -22,6 +22,3 @@ def first_join(user_id, name, code):
         cursor.execute(
             f'INSERT INTO users VALUES ("{user_id}", "{name}", "{datetime.datetime.now()}", "{user_id}", "{ref_code}", "0")')
         conn.commit()
-
-def create_db():
-    conn
