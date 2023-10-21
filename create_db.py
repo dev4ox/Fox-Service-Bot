@@ -21,7 +21,7 @@ import sqlite3
 3 таблица (payments):
 - id-пользователя (ключ):int,
 - стоимость заказа:int,
-- id-платежа в платёжной системе:str,
+- id-платежа:str,
 - дата оплаты:str
 '''
 name = input('Введите название для базы данных: ')
@@ -47,9 +47,9 @@ try:
                         order_id INTEGER PRIMARY KEY,
                         user_id INTEGER,
                         count INTEGER,
-                        order_list TEXT,
+                        discount INTEGER,
                         master TEXT,
-                        discont INTEGER,
+                        order_list TEXT,
                         order_date TEXT
                     )
                     ''')
@@ -57,7 +57,7 @@ try:
                     CREATE TABLE IF NOT EXISTS payments (
                         user_id INTEGER PRIMARY KEY,
                         count INTEGER,
-                        payment_id TEXT,
+                        pay_id TEXT,
                         pay_date TEXT
                     )
                     ''')
