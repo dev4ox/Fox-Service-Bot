@@ -7,7 +7,8 @@ import sqlite3
 - номер телефона (+79001234567):str,
 - e-mail (example@mail.ru):str,
 - подписка на канал:bool,
-- дата регистрации:str
+- дата регистрации:str,
+- имя пользователя:str
 
 2 таблица (orders):
 - номер заказа (ключ):int,
@@ -39,7 +40,8 @@ try:
                         email TEXT,
                         reg_date TEXT,
                         ref_code TEXT,
-                        sub_pub BOOLEAN
+                        sub_pub BOOLEAN,
+                        first_name TEXT
                     )
                     ''')
     cursor.execute('''

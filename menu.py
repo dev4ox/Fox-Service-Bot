@@ -4,7 +4,7 @@ import key
 
 def main():
     markup = types.InlineKeyboardMarkup(row_width=2)
-    button_1 = types.InlineKeyboardButton('📝  Сделать заказ', callback_data='order')
+    button_1 = types.InlineKeyboardButton('📝  Сделать заказ', callback_data='order_1')
     button_2 = types.InlineKeyboardButton('Канал в telegram  📢', url=key.public_url)
     button_3 = types.InlineKeyboardButton('🔑  Личный кабинет', callback_data='lk')
     markup.add(button_1, button_2, button_3)
@@ -18,12 +18,17 @@ def lk():
     markup.add(button_1, button_2, button_3)
     return markup
 
-def order():
+def order(page:int):
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='main')
-    button_2 = types.InlineKeyboardButton('📋  Каталог', callback_data='catalog')
-    button_3 = types.InlineKeyboardButton('📩  Написать нам', url=key.connect_url)
-    markup.add(button_1, button_2, button_3)
+    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.connect_url)
+    button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='order_'+str(page-1))
+    button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='order_'+str(page+1))
+    if page <= 1:
+        markup.add(button_1, button_2, button_4)
+    elif page >= 10:
+        markup.add(button_1, button_2, button_3)
+    else:
+        markup.add(button_1, button_2, button_3, button_4)
     return markup
-
 
