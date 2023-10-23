@@ -35,15 +35,13 @@ try:
                     CREATE TABLE IF NOT EXISTS users (
                         user_id INTEGER PRIMARY KEY,
                         username TEXT,
-                        fio TEXT,
+                        first_name TEXT,
+                        last_name TEXT,
                         phone TEXT,
                         email TEXT,
                         reg_date TEXT,
                         ref_code TEXT,
-                        sub_pub BOOLEAN,
-                        first_name TEXT
-                    )
-                    ''')
+                        sub_pub BOOLEAN)''')
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS orders (
                         order_id INTEGER PRIMARY KEY,
@@ -52,17 +50,14 @@ try:
                         discount INTEGER,
                         master TEXT,
                         order_list TEXT,
-                        order_date TEXT
-                    )
-                    ''')
+                        order_date TEXT)''')
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS payments (
-                        user_id INTEGER PRIMARY KEY,
+                        pay_id INTEGER PRIMARY KEY,
+                        user_id INTEGER,
                         count INTEGER,
-                        pay_id TEXT,
-                        pay_date TEXT
-                    )
-                    ''')
+                        pay_date TEXT,
+                        trans_id TEXT)''')
     print('База данных "' + name +'.sqlite" успешно создана')
 except Exception as e:
     print('Error create db\n', e)

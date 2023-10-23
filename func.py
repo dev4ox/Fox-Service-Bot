@@ -9,17 +9,30 @@ import json
 import datetime
 
 KEY_REQUESTS = {
+    10: ['users', 'user_id'],
     11: ['users', 'username'],
-    12: ['users', 'fio'],
-    13: ['users', 'phone'],
-    14: ['users', 'email'],
-    15: ['users', 'reg_date'],
-    16: ['users', 'ref_code'],
-    17: ['users', 'sub_pub'],
-    18: ['users', 'first_name']
+    12: ['users', 'first_name'],
+    13: ['users', 'last_name'],
+    14: ['users', 'phone'],
+    15: ['users', 'email'],
+    16: ['users', 'reg_date'],
+    17: ['users', 'ref_code'],
+    18: ['users', 'sub_pub'],
+    20: ['orders', 'order_id'],
+    21: ['orders', 'user_id'],
+    22: ['orders', 'count'],
+    23: ['orders', 'order_list'],
+    24: ['orders', 'master'],
+    25: ['orders', 'discont'],
+    26: ['orders', 'order_date'],
+    30: ['payments', 'pay_id'],
+    31: ['payments', 'user_id'],
+    32: ['payments', 'count'],
+    33: ['payments', 'pay_date'],
+    34: ['payments', 'trans_id']
 }
 
-def first_join(user_id, first_name, username, ref_code):
+def first_join(user_id, username, ref_code):
     conn = sqlite3.connect(key.db)
     cursor = conn.cursor()
     cursor.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
@@ -29,19 +42,19 @@ def first_join(user_id, first_name, username, ref_code):
         if ref_code == '':
             ref_code = 0
         # Получаем текущую дату и время
-        current_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        current_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         # Добавляем пользователя в базу данных
         cursor.execute(
-            'INSERT INTO users (user_id, username, fio, phone, email, reg_date, ref_code, sub_pub, first_name) '
+            'INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, sub_pub) '
             'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (user_id, username, '', '', '', current_date, ref_code, '', first_name))
+            (user_id, username, '', '', '', '', current_date, ref_code, ''))
         conn.commit()
     conn.close()
 
 
 
-# Запрос к данным users: 11-username, 12-fio, 13-phone, 14-email, 15-reg_date, 16-ref_code, 17-sub_pub, 18-first_name
-def db_req_users(user_id: int, parametr: list[int]):
+# Запрос к данным через ключи
+def db_req(user_id: int, parametr: list[int]):
     answer = []
     conn = sqlite3.connect(key.db)
     cursor = conn.cursor()
@@ -56,3 +69,5 @@ def db_req_users(user_id: int, parametr: list[int]):
         cursor.close()
         return answer
 
+def last_order(user_id:int):
+    pass

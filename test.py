@@ -1,4 +1,8 @@
-table_users = ['user_id', 'username', 'fio', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub']
+from func import *
+
+table_users = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub']
+table_orders = ['order_id', 'user_id', 'count', 'order_list', 'master', 'discont', 'order_date']
+table_payments = ['pay_id', 'user_id', 'count', 'pay_date', 'trans_id']
 message = {'content_type': 'text',
        'id': 1,
        'message_id': 1,
@@ -256,3 +260,36 @@ call = {'id': '5673885123357213651',
                                                                     'url': 'https://t.me/dev4ox'}]]}},
                  'chat_instance': '5649510892878336445',
                  'data': 'catalog'}}
+
+def db_r(user_id: int, parametr: list[int]):
+    answer = []
+    conn = sqlite3.connect(key.db)
+    cursor = conn.cursor()
+    try:
+        for i in parametr:
+            cursor.execute(f"SELECT {KEY_REQUESTS[i][1]} FROM {KEY_REQUESTS[i][0]} WHERE user_id=?", (user_id,))
+            result = cursor.fetchone()
+            answer.append(result[0])
+    except Exception as e:
+        print('db_req_users', e)
+    finally:
+        cursor.close()
+        return answer
+
+def db_w(user_id: int, parametr: dict[int, str]):
+    answer = []
+    conn = sqlite3.connect(key.db)
+    cursor = conn.cursor()
+    try:
+        for i in parametr:
+            cursor.execute(f"SELECT {KEY_REQUESTS[i][1]} FROM {KEY_REQUESTS[i][0]} WHERE user_id=?", (user_id,))
+            result = cursor.fetchone()
+            answer.append(result[0])
+    except Exception as e:
+        print('db_req_users', e)
+    finally:
+        cursor.close()
+        return answer
+
+db_w(5616021621, {})
+print(db_req(5616021621, [20, 26]))
