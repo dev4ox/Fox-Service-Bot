@@ -260,36 +260,3 @@ call = {'id': '5673885123357213651',
                                                                     'url': 'https://t.me/dev4ox'}]]}},
                  'chat_instance': '5649510892878336445',
                  'data': 'catalog'}}
-
-def db_r(user_id: int, parametr: list[int]):
-    answer = []
-    conn = sqlite3.connect(key.db)
-    cursor = conn.cursor()
-    try:
-        for i in parametr:
-            cursor.execute(f"SELECT {KEY_REQUESTS[i][1]} FROM {KEY_REQUESTS[i][0]} WHERE user_id=?", (user_id,))
-            result = cursor.fetchone()
-            answer.append(result[0])
-    except Exception as e:
-        print('db_req_users', e)
-    finally:
-        cursor.close()
-        return answer
-
-def db_w(user_id: int, parametr: dict[int, str]):
-    answer = []
-    conn = sqlite3.connect(key.db)
-    cursor = conn.cursor()
-    try:
-        for i in parametr:
-            cursor.execute(f"SELECT {KEY_REQUESTS[i][1]} FROM {KEY_REQUESTS[i][0]} WHERE user_id=?", (user_id,))
-            result = cursor.fetchone()
-            answer.append(result[0])
-    except Exception as e:
-        print('db_req_users', e)
-    finally:
-        cursor.close()
-        return answer
-
-db_w(5616021621, {})
-print(db_req(5616021621, [20, 26]))

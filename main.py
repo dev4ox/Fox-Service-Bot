@@ -14,24 +14,30 @@ if __name__ == '__main__':
 
         @bot.callback_query_handler(func=lambda call: True)
         def callback_process(call):
-            message = [call.message.chat.id, call.message.message_id]
-            user = func.db_req(message[0], [11, 12, 13, 14, 15, 16])
+            u_data = [call.message.chat.id, call.message.message_id]
+            user = func.db_r(u_data[0], [11, 12, 13, 14, 15, 16])
             if call.data == 'main':
-                bot.edit_message_text(text.main, message[0], message[1], parse_mode='html', reply_markup=menu.main())
+                bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
             elif 'order' in call.data:
                 page = call.data.split('_')
-                bot.edit_message_text(text.order.format(page[1]), message[0], message[1], parse_mode='html',
+                bot.edit_message_text(text.order.format(page[1]), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.order(int(page[1]), 5))
             elif call.data == 'lk':
-                last_data = []
+                last_data = func.db_r_last(u_data[0], 'orders')
+                print(last_data)
                 if not last_data:
-                    last_data = ['-', '-', '-', '-', '-']
-                bot.edit_message_text(text.lk.format(last_data[0], last_data[1], last_data[2], last_data[3], last_data[4]),
-                                      message[0], message[1], parse_mode='html', reply_markup=menu.lk())
-
-            elif call.data == 'setting':
+                    last_data = ['-', '-', '-', '-', '-', '-', '-']
+                    count = '-'
+                else:
+                    count = int(last_data[2] * (100 - last_data[3]) / 100)
+                bot.edit_message_text(text.lk.format(user[2], user[1], last_data[1], last_data[6], count, last_data[4],
+                                                     last_data[5]), u_data[0], u_data[1],
+                                                     parse_mode='html', reply_markup=menu.lk())
+            elif call.data == 'sing_up':
                 pass
             elif call.data == 'user_data':
+                pass
+            elif call.data == 'setting':
                 pass
             elif call.data == 'user_history':
                 pass
