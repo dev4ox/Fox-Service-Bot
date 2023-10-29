@@ -33,8 +33,6 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.lk.format(user[2], user[1], last_data[1], last_data[6], count, last_data[4],
                                                      last_data[5]), u_data[0], u_data[1],
                                                      parse_mode='html', reply_markup=menu.lk())
-            elif call.data == 'sing_up':
-                pass
             elif call.data == 'user_data':
                 pass
             elif call.data == 'setting':

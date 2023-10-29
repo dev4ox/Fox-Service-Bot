@@ -35,7 +35,7 @@ def order(page:int, max_page:int):
 def user_data():
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='lk')
-    button_2 = types.InlineKeyboardButton('🔏  Редактировать', callback_data='setting')
+    button_2 = types.InlineKeyboardButton('🔏  Редактировать', callback_data='')
     markup.add(button_1, button_2)
     return markup
 
