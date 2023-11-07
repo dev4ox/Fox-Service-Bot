@@ -50,6 +50,13 @@ def setting():
     return markup
 
 
+def user_history():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='lk')
+    markup.add(button_1)
+    return markup
+
+
 def com_admin():
     markup = types.InlineKeyboardMarkup(row_width=1)
     button_1 = types.InlineKeyboardButton('🔃  Обновить каталог', callback_data='a_update_catalog1')

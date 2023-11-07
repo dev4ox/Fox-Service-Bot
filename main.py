@@ -16,7 +16,6 @@ if __name__ == '__main__':
             elif message.text == '/admin' and u_data[0] == key.admin_id:
                 bot.send_message(u_data[0], text.com_admin.format(u_data[0]), reply_markup=menu.com_admin())
 
-
         @bot.callback_query_handler(func=lambda call: True)
         def callback_process(call):
             u_data = [call.message.chat.id, call.message.message_id]
@@ -24,10 +23,10 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
             elif 'order' in call.data:
                 page = call.data.split('_')
-                bot.edit_message_text(text.order.format(page[1]), u_data[0], u_data[1], parse_mode='html',
-                                      reply_markup=menu.order(int(page[1]), 5))
+                bot.edit_message_text(text.order(page[1], func.catalog_r(page[1])), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.order(int(page[1]), func.page_max))
             elif call.data == 'lk':
-                user = func.db_r(u_data[0], [13, 12])
+                user = func.db_r_one(u_data[0], [13, 12])
                 data = func.db_r_last(u_data[0], 'orders')
                 if data is None:
                     data = ['-', '-', '-', '-', '-', '-', '-']
@@ -37,16 +36,19 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.lk.format(user[0], user[1], data[1], data[6], count, data[4], data[5]),
                                       u_data[0], u_data[1], parse_mode='html', reply_markup=menu.lk())
             elif call.data == 'user_data':
-                data = func.db_r(u_data[0], [10, 12, 13, 14, 15, 18])
+                data = func.db_r_one(u_data[0], [10, 12, 13, 14, 15, 18])
                 bot.edit_message_text(text.user_data.format(data[0], data[1], data[2], data[3], data[4], data[5]),
                                       u_data[0], u_data[1], parse_mode='html', reply_markup=menu.user_data())
             elif call.data == 'setting':
-                user = func.db_r(u_data[0], [10, 11])
+                user = func.db_r_one(u_data[0], [10, 11])
                 bot.send_message(key.ch_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
                 bot.edit_message_text(text.setting.format(key.con_url), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.setting())
             elif call.data == 'user_history':
-                pass
+                # data = func.user_history(u_data[0])
+                # bot.edit_message_text(text.user_history.format(data), u_data[0], u_data[1])
+                bot.edit_message_text(text.user_history.format(u_data[0]), u_data[0], u_data[1],
+                                      reply_markup=menu.user_history())
             elif call.data == 'main_admin' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.com_admin.format(u_data[0]), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.com_admin())
@@ -54,9 +56,9 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.a_update_catalog1.format(key.catalog), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.update_catalog1())
             elif call.data == 'a_update_catalog2' and u_data[0] == key.admin_id:
-                data = func.update_catalog()
-                bot.edit_message_text(text.a_update_catalog2.format(data), u_data[0], u_data[1], parse_mode='html',
-                                      reply_markup=menu.update_catalog2())
+                data = func.catalog_u()
+                bot.edit_message_text(text.a_update_catalog2.format(data[0], data[1]), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.update_catalog2())
             else:
                 bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
 

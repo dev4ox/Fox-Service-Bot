@@ -30,29 +30,36 @@ KEY_REQUESTS = {
     42: ['catalog', 'count']
 }
 
-t_now = lambda: datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+t_now = lambda: datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+len_catalog: int = 0
+page_max: int = 1
 
 
+# Первый вход (первая запись в БД)
 def first_join(user_id, username, ref_code):
-    conn = sqlite3.connect(key.db)
-    cursor = conn.cursor()
-    cursor.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
-    existing_user = cursor.fetchone()
-    # Если новый пользователь
-    if not existing_user:
-        if ref_code == '':
-            ref_code = 0
-        # Добавляем пользователя в базу данных
-        cursor.execute(
-            'INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, sub_pub) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (user_id, username, '-', '-', '-', '-', t_now(), ref_code, '0'))
-        conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect(key.db)
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
+        existing_user = cursor.fetchone()
+        # Если новый пользователь
+        if not existing_user:
+            if ref_code == '':
+                ref_code = 0
+            # Добавляем пользователя в базу данных
+            cursor.execute(
+                "INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, sub_pub"
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (user_id, username, '-', '-', '-', '-', t_now(), ref_code, '0'))
+            conn.commit()
+    except Exception as e:
+        print('"first_join"', e)
+    finally:
+        conn.close()
 
 
-# Чтение данных, используя ключи
-def db_r(user_id: int, parametr: list[int]):
+# Читает записи в таблице, используя ключи
+def db_r_one(user_id: int, parametr: list[int]):
     answer = []
     conn = sqlite3.connect(key.db)
     try:
@@ -63,7 +70,7 @@ def db_r(user_id: int, parametr: list[int]):
             answer.append(result[0])
         return answer
     except Exception as e:
-        print('db_r', e)
+        print('"db_r"', e)
     finally:
         conn.close()
 
@@ -76,7 +83,7 @@ def db_r_last(user_id: int, table: str):
         result = cursor.fetchone()
         return result
     except Exception as e:
-        print('db_r_last:', e)
+        print('"db_r_last":', e)
     finally:
         conn.close()
 
@@ -85,20 +92,32 @@ def db_r_last(user_id: int, table: str):
 def db_w_new_order(user_id: int, count: int, discount: int, order_list: str, master: str):
     conn = sqlite3.connect(key.db)
     try:
-        cursor = conn.execute(f"SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
+        cursor = conn.execute("SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
         order_id = cursor.fetchone()[0] + 1
-        cursor.execute(f"INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
-                       f"VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_id, count, discount, order_list, master,
-                                                         t_now()))
+        cursor.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) VALUES "
+                       "(?, ?, ?, ?, ?, ?, ?)", (order_id, user_id, count, discount, order_list, master, t_now()))
         conn.commit()
     except Exception as e:
-        print('db_w_orders', e)
+        print('"db_w_orders"', e)
     finally:
         conn.close()
 
 
+# #История заказов пользователя
+# def user_history(user_id: int):
+#     conn = sqlite3.connect(key.db)
+#     try:
+#         cursor = conn.execute(f"SELECT * FROM orders WHERE user_id=? ORDER BY order_id DESC LIMIT 1", (user_id,))
+#         result = cursor.fetchone()
+#         return result
+#     except Exception as e:
+#         print('"db_r_last":', e)
+#     finally:
+#         conn.close()
+
+
 # Обновление каталога из файла excel
-def update_catalog():
+def catalog_u():
     try:
         wb = openpyxl.load_workbook(key.catalog)
         sheet = wb.active
@@ -108,12 +127,41 @@ def update_catalog():
             if type(i[0]) is int:
                 list_catalog.append(i)
         wb.close()
-        # list_catalog.insert(0, len(list_catalog))
+        global len_catalog, page_max
+        len_catalog = len(list_catalog)
+        page_max = (len_catalog - 1 // 10)
+        print(len_catalog, page_max)
         conn = sqlite3.connect(key.db)
+        conn.execute('DELETE FROM catalog')
         for item_id, name, count in list_catalog:
-            conn.execute(f"INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
+            conn.execute("INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
         conn.commit()
-        return 'Каталог успешно обновлён'
+        return 'Каталог успешно обновлён', len_catalog
     except Exception as e:
-        print('update_catalog', e)
-        return 'Ошибка обновления'
+        print('"catalog_u"', e)
+        return 'Ошибка обновления', 0
+    finally:
+        conn.close()
+
+
+
+def catalog_r(page: str):
+    try:
+        page = int(page)
+        result = []
+        conn = sqlite3.connect(key.db)
+        cur = conn.cursor()
+        if page > 1:
+            out_ids = [int(str(page - 1) + '1'), int(str(page) + '0')]
+        else:
+            out_ids = [1, 10]
+        cur.execute(f"SELECT item_id, name, count FROM catalog WHERE item_id BETWEEN {out_ids[0]} AND {out_ids[1]}")
+        rows = cur.fetchall()
+        for row in rows:
+            result.append(row)
+        return result
+    except Exception as e:
+        print('"catalog_r"', e)
+    finally:
+        conn.close()
+

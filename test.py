@@ -1,7 +1,7 @@
-import openpyxl
-
-from func import *
-
+import func
+import key
+import text
+import menu
 table_users = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub']
 table_orders = ['order_id', 'user_id', 'count', 'discount', 'master', 'order_list', 'order_date']
 table_payments = ['order_id', 'user_id', 'count', 'pay_date', 'trans_id']
@@ -263,29 +263,15 @@ call = {'id': '5673885123357213651',
                  'data': 'catalog'}}
 
 
-test_catalog = [[1, 'q', 100],
-                [2, 'w', 200],
-                [3, 'e', 300],
+test_catalog = [[1, 'Тест название длиной в 26 символов !', 100],
+                [2, 'Установка ОС', 200],
+                [3, 'Чистка ПК от пыли', 300],
                 [4, 'r', 400],
                 [5, 't', 500],
                 [6, 'y', 600],
                 [7, 'u', 700],
                 [8, 'i', 800],
-                [9, 'o', 900]]
-
-def test_update_catalog():
-    try:
-        wb = openpyxl.load_workbook(key.catalog)
-        sheet = wb.active
-        list_catalog = []
-        for row in sheet.iter_rows():
-            i = [cell.value for cell in row]
-            if type(i[0]) is int:
-                list_catalog.append(i)
-        wb.close()
-        # list_catalog.insert(0, len(list_catalog))
-        for item_id, name, count in list_catalog:
-            print(item_id)
-    except Exception as e:
-        print(e)
-test_update_catalog()
+                [9, 'o', 900],
+                [10, 'p', 1000]]
+func.catalog_u()
+print(func.catalog_r(1))
