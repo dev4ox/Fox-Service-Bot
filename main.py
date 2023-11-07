@@ -7,15 +7,19 @@ import text
 bot = telebot.TeleBot(key.bot_token)
 if __name__ == '__main__':
     def bot_main():
-        @bot.message_handler(commands=['start'])
+        @bot.message_handler(commands=['start', 'admin', 'sql', 'pay'])
         def command_start(message):
-            func.first_join(message.from_user.id, message.from_user.username, message.text[6:])
-            bot.send_message(message.from_user.id, text.main, parse_mode='html', reply_markup=menu.main())
+            u_data = [message.from_user.id, message.from_user.username]
+            if message.text == '/start':
+                func.first_join(u_data[0], u_data[1], message.text[6:])
+                bot.send_message(u_data[0], text.main, parse_mode='html', reply_markup=menu.main())
+            elif message.text == '/admin' and u_data[0] == key.admin_id:
+                bot.send_message(u_data[0], text.com_admin.format(u_data[0]), reply_markup=menu.com_admin())
+
 
         @bot.callback_query_handler(func=lambda call: True)
         def callback_process(call):
             u_data = [call.message.chat.id, call.message.message_id]
-            user = func.db_r(u_data[0], [11, 12, 13, 14, 15, 16])
             if call.data == 'main':
                 bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
             elif 'order' in call.data:
@@ -23,25 +27,38 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.order.format(page[1]), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.order(int(page[1]), 5))
             elif call.data == 'lk':
-                last_data = func.db_r_last(u_data[0], 'orders')
-                print(last_data)
-                if not last_data:
-                    last_data = ['-', '-', '-', '-', '-', '-', '-']
+                user = func.db_r(u_data[0], [13, 12])
+                data = func.db_r_last(u_data[0], 'orders')
+                if data is None:
+                    data = ['-', '-', '-', '-', '-', '-', '-']
                     count = '-'
                 else:
-                    count = int(last_data[2] * (100 - last_data[3]) / 100)
-                bot.edit_message_text(text.lk.format(user[2], user[1], last_data[1], last_data[6], count, last_data[4],
-                                                     last_data[5]), u_data[0], u_data[1],
-                                                     parse_mode='html', reply_markup=menu.lk())
+                    count = int(data[2] * (100 - data[3]) / 100)
+                bot.edit_message_text(text.lk.format(user[0], user[1], data[1], data[6], count, data[4], data[5]),
+                                      u_data[0], u_data[1], parse_mode='html', reply_markup=menu.lk())
             elif call.data == 'user_data':
-                pass
+                data = func.db_r(u_data[0], [10, 12, 13, 14, 15, 18])
+                bot.edit_message_text(text.user_data.format(data[0], data[1], data[2], data[3], data[4], data[5]),
+                                      u_data[0], u_data[1], parse_mode='html', reply_markup=menu.user_data())
             elif call.data == 'setting':
-                pass
+                user = func.db_r(u_data[0], [10, 11])
+                bot.send_message(key.ch_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
+                bot.edit_message_text(text.setting.format(key.con_url), u_data[0], u_data[1], parse_mode='html',
+                                      reply_markup=menu.setting())
             elif call.data == 'user_history':
                 pass
+            elif call.data == 'main_admin' and u_data[0] == key.admin_id:
+                bot.edit_message_text(text.com_admin.format(u_data[0]), u_data[0], u_data[1], parse_mode='html',
+                                      reply_markup=menu.com_admin())
+            elif call.data == 'a_update_catalog1' and u_data[0] == key.admin_id:
+                bot.edit_message_text(text.a_update_catalog1.format(key.catalog), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.update_catalog1())
+            elif call.data == 'a_update_catalog2' and u_data[0] == key.admin_id:
+                data = func.update_catalog()
+                bot.edit_message_text(text.a_update_catalog2.format(data), u_data[0], u_data[1], parse_mode='html',
+                                      reply_markup=menu.update_catalog2())
             else:
-                bot.edit_message_text(text.main.format(user[1]), user[0], user[2], parse_mode='html',
-                                      reply_markup=menu.main())
+                bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
 
         bot.polling(none_stop=True)
 

@@ -5,10 +5,11 @@ import key
 def main():
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('📝  Сделать заказ', callback_data='order_1')
-    button_2 = types.InlineKeyboardButton('Канал в telegram  📢', url=key.public_url)
+    button_2 = types.InlineKeyboardButton('Канал в telegram  📢', url=key.pub_url)
     button_3 = types.InlineKeyboardButton('🔑  Личный кабинет', callback_data='lk')
     markup.add(button_1, button_2, button_3)
     return markup
+
 
 def lk():
     markup = types.InlineKeyboardMarkup(row_width=2)
@@ -18,12 +19,13 @@ def lk():
     markup.add(button_1, button_2, button_3)
     return markup
 
-def order(page:int, max_page:int):
+
+def order(page: int, max_page: int):
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='main')
-    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.connect_url)
-    button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='order_'+str(page-1))
-    button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='order_'+str(page+1))
+    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.con_url)
+    button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='order_' + str(page - 1))
+    button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='order_' + str(page + 1))
     if page <= 1:
         markup.add(button_1, button_2, button_4)
     elif page >= max_page:
@@ -32,10 +34,41 @@ def order(page:int, max_page:int):
         markup.add(button_1, button_2, button_3, button_4)
     return markup
 
+
 def user_data():
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='lk')
-    button_2 = types.InlineKeyboardButton('🔏  Редактировать', callback_data='')
+    button_2 = types.InlineKeyboardButton('🔏  Редактировать', callback_data='setting')
     markup.add(button_1, button_2)
     return markup
 
+
+def setting():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    button_1 = types.InlineKeyboardButton('⬅️  В главное меню', callback_data='main')
+    markup.add(button_1)
+    return markup
+
+
+def com_admin():
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    button_1 = types.InlineKeyboardButton('🔃  Обновить каталог', callback_data='a_update_catalog1')
+    button_2 = types.InlineKeyboardButton('👥  Список пользователей', callback_data='a_user_list')
+
+    markup.add(button_1, button_2)
+    return markup
+
+
+def update_catalog1():
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='main_admin')
+    button_2 = types.InlineKeyboardButton('🔃  Обновить', callback_data='a_update_catalog2')
+    markup.add(button_1, button_2)
+    return markup
+
+
+def update_catalog2():
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='main_admin')
+    markup.add(button_1)
+    return markup

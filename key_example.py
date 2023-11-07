@@ -2,7 +2,7 @@
 bot_token = ''
 # ник бота:str
 bot_login = ''
-# id-канала информации, без -100 (пример: 124873248):int
+# id-канала информации, (пример: -100124873248):int
 CHANNEL_ID = 0
 # id-админа:int
 admin_id = 0
@@ -16,3 +16,5 @@ pay_token = ''
 db = ''
 # Процент реферальной системы:int
 ref_percent = 0
+#Название каталога
+catalog = 'catalog.xlsx'

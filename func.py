@@ -1,12 +1,7 @@
-from telebot import types
 import sqlite3
-import telebot
-import os
-import key
-import random
-import requests
-import json
 import datetime
+import key
+import openpyxl
 
 KEY_REQUESTS = {
     10: ['users', 'user_id'],
@@ -29,8 +24,13 @@ KEY_REQUESTS = {
     31: ['payments', 'user_id'],
     32: ['payments', 'count'],
     33: ['payments', 'pay_date'],
-    34: ['payments', 'trans_id']
+    34: ['payments', 'trans_id'],
+    40: ['catalog', 'item_id'],
+    41: ['catalog', 'name'],
+    42: ['catalog', 'count']
 }
+
+t_now = lambda: datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
 
 def first_join(user_id, username, ref_code):
@@ -42,18 +42,16 @@ def first_join(user_id, username, ref_code):
     if not existing_user:
         if ref_code == '':
             ref_code = 0
-        # Получаем текущую дату и время
-        now_d = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
         # Добавляем пользователя в базу данных
         cursor.execute(
             'INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, sub_pub) '
             'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            (user_id, username, '', '', '', '', now_d, ref_code, ''))
+            (user_id, username, '-', '-', '-', '-', t_now(), ref_code, '0'))
         conn.commit()
     conn.close()
 
 
-# Запрос к данным через ключи
+# Чтение данных, используя ключи
 def db_r(user_id: int, parametr: list[int]):
     answer = []
     conn = sqlite3.connect(key.db)
@@ -65,11 +63,12 @@ def db_r(user_id: int, parametr: list[int]):
             answer.append(result[0])
         return answer
     except Exception as e:
-        print('db_req_users', e)
+        print('db_r', e)
     finally:
         conn.close()
 
 
+# Читает последнюю запись в БД
 def db_r_last(user_id: int, table: str):
     conn = sqlite3.connect(key.db)
     try:
@@ -77,26 +76,44 @@ def db_r_last(user_id: int, table: str):
         result = cursor.fetchone()
         return result
     except Exception as e:
-        print('db_req_users', e)
-        return None
+        print('db_r_last:', e)
     finally:
         conn.close()
 
 
-def db_w_orders(user_id: int, count: int, order_list: str, master: str, discount: int):
+# Записывает новый заказ (Смотрит на последний заказ в таблице)
+def db_w_new_order(user_id: int, count: int, discount: int, order_list: str, master: str):
     conn = sqlite3.connect(key.db)
     try:
-        cursor = conn.cursor()
-        now_d = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-        order_id = int(db_r_last(user_id, 'orders')[0])
-        if not order_id:
-            order_id = 1
-        else:
-            order_id += 1
-        conn.execute(f"INSERT INTO orders (order_id, user_id, count, order_list, master, discount, order_date) "
-                     f"VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_id, count, order_list, master, discount, now_d))
+        cursor = conn.execute(f"SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
+        order_id = cursor.fetchone()[0] + 1
+        cursor.execute(f"INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
+                       f"VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_id, count, discount, order_list, master,
+                                                         t_now()))
         conn.commit()
     except Exception as e:
-        print('db_req_users', e)
+        print('db_w_orders', e)
     finally:
         conn.close()
+
+
+# Обновление каталога из файла excel
+def update_catalog():
+    try:
+        wb = openpyxl.load_workbook(key.catalog)
+        sheet = wb.active
+        list_catalog = []
+        for row in sheet.iter_rows():
+            i = [cell.value for cell in row]
+            if type(i[0]) is int:
+                list_catalog.append(i)
+        wb.close()
+        # list_catalog.insert(0, len(list_catalog))
+        conn = sqlite3.connect(key.db)
+        for item_id, name, count in list_catalog:
+            conn.execute(f"INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
+        conn.commit()
+        return 'Каталог успешно обновлён'
+    except Exception as e:
+        print('update_catalog', e)
+        return 'Ошибка обновления'

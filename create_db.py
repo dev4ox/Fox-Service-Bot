@@ -1,7 +1,8 @@
 import sqlite3
-info = ''' Создание базы данных ({}.db)
+
+info = '''
 1 таблица (users):
-- id-пользователя (ключ):int,
+- (KEY) id-пользователя:int,
 - ник пользователя:str,
 - имя:str,
 - фамилия:str,
@@ -12,7 +13,7 @@ info = ''' Создание базы данных ({}.db)
 - подписка на канал:bool
 
 2 таблица (orders):
-- номер заказа (ключ):int,
+- (KEY) id-заказа:int,
 - id-пользователя:int,
 - стоимость заказа:int,
 - скидка (1-100):int,
@@ -21,21 +22,27 @@ info = ''' Создание базы данных ({}.db)
 - дата выполнения заказа:str
 
 3 таблица (payments):
-- id-платежа (ключ):int,
+- (KEY) id-заказа, оплаченный:int,
 - id-пользователя:int,
 - стоимость:int,
 - дата оплаты:str,
 - id-транзакции (в платёжке):str
+
+4 таблица (catalog):
+- (KEY) id-услуги:int,
+- название услуги:str,
+- стоимость услуги:int
 '''
+
 name = input('Введите название для базы данных: ')
 if name == '':
     name = 'database'
 try:
-    conn = sqlite3.connect(name +'.sqlite')
+    conn = sqlite3.connect(name + '.sqlite')
     cursor = conn.cursor()
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS users (
-                        user_id INTEGER PRIMARY KEY,
+                        user_id INTEGER,
                         username TEXT,
                         first_name TEXT,
                         last_name TEXT,
@@ -55,15 +62,22 @@ try:
                         order_date TEXT)''')
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS payments (
-                        pay_id INTEGER PRIMARY KEY,
+                        order_id INTEGER PRIMARY KEY,
                         user_id INTEGER,
                         count INTEGER,
                         pay_date TEXT,
                         trans_id TEXT)''')
-    print(info.format(name))
-    print('\n База данных "' + name + '.sqlite" успешно создана')
+    cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS catalog (
+                        item_id INTEGER PRIMARY KEY,
+                        name TEXT,
+                        count INTEGER)''')
+    cursor.execute(f"INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
+                   f"VALUES (?, ?, ?, ?, ?, ?, ?)", (0, 0, 0, 0, 0, 0, 0))
+    conn.commit()
+    conn.close()
+    print(info)
+    print('База данных "' + name + '.sqlite" успешно создана')
 except Exception as e:
     print('Error create db\n', e)
-finally:
-    cursor.close()
     conn.close()
