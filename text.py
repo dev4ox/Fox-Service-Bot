@@ -26,14 +26,14 @@ main = '''
 '''
 
 
-def order(page: str, list_catalog: list):
+def order(page: str, page_max: int, list_catalog: list):
     result = ['id  |     Название услуги      | Цена']
     for a, b, c in list_catalog:
         a = str(a)
         if len(a) < 2:
             a += '  '
         result.append(f'\n--------------------------------------------------------\n{a} | {b} | {c} р.')
-    return f'<b>Каталог | Страница {page}</b>\n{" ".join([i for i in result])}\n' \
+    return f'<b>Каталог | Страница {page} из {page_max}</b>\n{" ".join([i for i in result])}\n' \
            f'--------------------------------------------------------\n<b>Оформить заказ</b>           👇👇👇'
 
 
@@ -73,9 +73,14 @@ setting = '''
 {}
 '''
 
-user_history = '''
-Ваша история заказов:
-'''
+def user_history(l_name: str, f_name: str, page: str, page_max: str, list_history: list):
+    result = []
+    for a, b, c in list_history:
+        a = str(a)
+        if len(a) < 2:
+            a += '  '
+        result.append(f'\n--------------------------------------------------------\n{a} | {b} | {c}')
+    return f'История заказов {l_name} {f_name}\nСтраница {page} из {page_max}{" ".join([i for i in result])}\n'
 
 com_admin = '''
 Меню админа

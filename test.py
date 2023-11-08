@@ -273,5 +273,7 @@ test_catalog = [[1, 'Тест название длиной в 26 символо
                 [8, 'i', 800],
                 [9, 'o', 900],
                 [10, 'p', 1000]]
-func.catalog_u()
-print(func.catalog_r(1))
+len_catalog = len(test_catalog)
+
+page_max = (len_catalog - 1) // 10 + 1
+print(page_max)

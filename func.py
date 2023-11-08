@@ -13,6 +13,7 @@ KEY_REQUESTS = {
     16: ['users', 'reg_date'],
     17: ['users', 'ref_code'],
     18: ['users', 'sub_pub'],
+    19: ['users', 'num_orders'],
     20: ['orders', 'order_id'],
     21: ['orders', 'user_id'],
     22: ['orders', 'count'],
@@ -48,9 +49,9 @@ def first_join(user_id, username, ref_code):
                 ref_code = 0
             # Добавляем пользователя в базу данных
             cursor.execute(
-                "INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, sub_pub"
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                (user_id, username, '-', '-', '-', '-', t_now(), ref_code, '0'))
+                "INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code,"
+                "sub_pub, num_orders) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (user_id, username, '-', '-', '-', '-', t_now(), ref_code, 0, 0))
             conn.commit()
     except Exception as e:
         print('"first_join"', e)
@@ -70,7 +71,7 @@ def db_r_one(user_id: int, parametr: list[int]):
             answer.append(result[0])
         return answer
     except Exception as e:
-        print('"db_r"', e)
+        print('"db_r_one"', e)
     finally:
         conn.close()
 
@@ -103,17 +104,18 @@ def db_w_new_order(user_id: int, count: int, discount: int, order_list: str, mas
         conn.close()
 
 
-# #История заказов пользователя
-# def user_history(user_id: int):
-#     conn = sqlite3.connect(key.db)
-#     try:
-#         cursor = conn.execute(f"SELECT * FROM orders WHERE user_id=? ORDER BY order_id DESC LIMIT 1", (user_id,))
-#         result = cursor.fetchone()
-#         return result
-#     except Exception as e:
-#         print('"db_r_last":', e)
-#     finally:
-#         conn.close()
+#История заказов пользователя
+def user_history(user_id: int):
+    conn = sqlite3.connect(key.db)
+    try:
+        # cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=? BETWEEN {1} AND {10}", (user_id,))
+        cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=?", (user_id,))
+        result = cursor.fetchone()
+        return result
+    except Exception as e:
+        print('"user_history":', e)
+    finally:
+        conn.close()
 
 
 # Обновление каталога из файла excel
@@ -129,8 +131,7 @@ def catalog_u():
         wb.close()
         global len_catalog, page_max
         len_catalog = len(list_catalog)
-        page_max = (len_catalog - 1 // 10)
-        print(len_catalog, page_max)
+        page_max = (len_catalog - 1) // 10 + 1
         conn = sqlite3.connect(key.db)
         conn.execute('DELETE FROM catalog')
         for item_id, name, count in list_catalog:
@@ -142,7 +143,6 @@ def catalog_u():
         return 'Ошибка обновления', 0
     finally:
         conn.close()
-
 
 
 def catalog_r(page: str):
@@ -164,4 +164,3 @@ def catalog_r(page: str):
         print('"catalog_r"', e)
     finally:
         conn.close()
-

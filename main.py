@@ -23,8 +23,8 @@ if __name__ == '__main__':
                 bot.edit_message_text(text.main, u_data[0], u_data[1], parse_mode='html', reply_markup=menu.main())
             elif 'order' in call.data:
                 page = call.data.split('_')
-                bot.edit_message_text(text.order(page[1], func.catalog_r(page[1])), u_data[0], u_data[1],
-                                      parse_mode='html', reply_markup=menu.order(int(page[1]), func.page_max))
+                bot.edit_message_text(text.order(page[1], func.page_max, func.catalog_r(page[1])), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.order(int(page[1]), 1))
             elif call.data == 'lk':
                 user = func.db_r_one(u_data[0], [13, 12])
                 data = func.db_r_last(u_data[0], 'orders')
@@ -44,11 +44,13 @@ if __name__ == '__main__':
                 bot.send_message(key.ch_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
                 bot.edit_message_text(text.setting.format(key.con_url), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.setting())
-            elif call.data == 'user_history':
-                # data = func.user_history(u_data[0])
-                # bot.edit_message_text(text.user_history.format(data), u_data[0], u_data[1])
-                bot.edit_message_text(text.user_history.format(u_data[0]), u_data[0], u_data[1],
-                                      reply_markup=menu.user_history())
+            elif 'user_history' in call.data:
+                page = call.data.split('_')
+                user = func.db_r_one(u_data[0], [13, 12])
+                page_max, *data = func.user_history
+                bot.edit_message_text(text.user_history(user[0], user[1], page[2], page_max, data),
+                                      u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.user_history(int(page[1]), func.page_max))
             elif call.data == 'main_admin' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.com_admin.format(u_data[0]), u_data[0], u_data[1], parse_mode='html',
                                       reply_markup=menu.com_admin())

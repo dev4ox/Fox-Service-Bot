@@ -10,7 +10,8 @@ info = '''
 - e-mail (example@mail.ru):str,
 - дата регистрации:str,
 - реферальный код:str,
-- подписка на канал:bool
+- подписка на канал:bool,
+- количество заказов:int
 
 2 таблица (orders):
 - (KEY) id-заказа:int,
@@ -50,7 +51,8 @@ try:
                         email TEXT,
                         reg_date TEXT,
                         ref_code TEXT,
-                        sub_pub BOOLEAN)''')
+                        sub_pub BOOLEAN,
+                        num_orders INTEGER)''')
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS orders (
                         order_id INTEGER PRIMARY KEY,
