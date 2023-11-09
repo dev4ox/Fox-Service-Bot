@@ -104,7 +104,7 @@ def db_w_new_order(user_id: int, count: int, discount: int, order_list: str, mas
         conn.close()
 
 
-#История заказов пользователя
+#История заказов пользователя return(max_page, [id, master, count])
 def user_history(user_id: int):
     conn = sqlite3.connect(key.db)
     try:

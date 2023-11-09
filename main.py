@@ -24,7 +24,7 @@ if __name__ == '__main__':
             elif 'order' in call.data:
                 page = call.data.split('_')
                 bot.edit_message_text(text.order(page[1], func.page_max, func.catalog_r(page[1])), u_data[0], u_data[1],
-                                      parse_mode='html', reply_markup=menu.order(int(page[1]), 1))
+                                      parse_mode='html', reply_markup=menu.order(int(page[1]), func.page_max))
             elif call.data == 'lk':
                 user = func.db_r_one(u_data[0], [13, 12])
                 data = func.db_r_last(u_data[0], 'orders')
