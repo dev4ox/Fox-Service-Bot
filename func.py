@@ -38,8 +38,8 @@ page_max: int = 1
 
 # Первый вход (первая запись в БД)
 def first_join(user_id, username, ref_code):
+    conn = sqlite3.connect(key.db)
     try:
-        conn = sqlite3.connect(key.db)
         cursor = conn.cursor()
         cursor.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
         existing_user = cursor.fetchone()
@@ -49,7 +49,7 @@ def first_join(user_id, username, ref_code):
                 ref_code = 0
             # Добавляем пользователя в базу данных
             cursor.execute(
-                "INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code,"
+                "INSERT INTO users (user_id, username, first_name, last_name, phone, email, reg_date, ref_code, "
                 "sub_pub, num_orders) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (user_id, username, '-', '-', '-', '-', t_now(), ref_code, 0, 0))
             conn.commit()
@@ -89,28 +89,14 @@ def db_r_last(user_id: int, table: str):
         conn.close()
 
 
-# Записывает новый заказ (Смотрит на последний заказ в таблице)
-def db_w_new_order(user_id: int, count: int, discount: int, order_list: str, master: str):
-    conn = sqlite3.connect(key.db)
-    try:
-        cursor = conn.execute("SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
-        order_id = cursor.fetchone()[0] + 1
-        cursor.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) VALUES "
-                       "(?, ?, ?, ?, ?, ?, ?)", (order_id, user_id, count, discount, order_list, master, t_now()))
-        conn.commit()
-    except Exception as e:
-        print('"db_w_orders"', e)
-    finally:
-        conn.close()
-
-
-#История заказов пользователя return(max_page, [id, master, count])
+# История заказов пользователя return(max_page, [id, master, count])
 def user_history(user_id: int):
     conn = sqlite3.connect(key.db)
     try:
         # cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=? BETWEEN {1} AND {10}", (user_id,))
-        cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=?", (user_id,))
-        result = cursor.fetchone()
+        cursor = conn.execute(f"SELECT order_id, master, count FROM orders WHERE user_id=?", (user_id,))
+        result = cursor.fetchall()
+        print(result)
         return result
     except Exception as e:
         print('"user_history":', e)
@@ -119,7 +105,8 @@ def user_history(user_id: int):
 
 
 # Обновление каталога из файла excel
-def catalog_u():
+def db_catalog_u():
+    conn = sqlite3.connect(key.db)
     try:
         wb = openpyxl.load_workbook(key.catalog)
         sheet = wb.active
@@ -132,7 +119,6 @@ def catalog_u():
         global len_catalog, page_max
         len_catalog = len(list_catalog)
         page_max = (len_catalog - 1) // 10 + 1
-        conn = sqlite3.connect(key.db)
         conn.execute('DELETE FROM catalog')
         for item_id, name, count in list_catalog:
             conn.execute("INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
@@ -145,11 +131,11 @@ def catalog_u():
         conn.close()
 
 
-def catalog_r(page: str):
+def db_catalog_r(page: str):
+    conn = sqlite3.connect(key.db)
     try:
         page = int(page)
         result = []
-        conn = sqlite3.connect(key.db)
         cur = conn.cursor()
         if page > 1:
             out_ids = [int(str(page - 1) + '1'), int(str(page) + '0')]
@@ -162,5 +148,23 @@ def catalog_r(page: str):
         return result
     except Exception as e:
         print('"catalog_r"', e)
+    finally:
+        conn.close()
+
+
+# Записывает новый заказ (Смотрит на последний заказ в таблице)
+def db_w_new_order(user_data: list):
+    conn = sqlite3.connect(key.db)
+    try:
+        cursor = conn.execute("SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
+        order_id = cursor.fetchone()[0] + 1
+        cursor.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
+                       "VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_data[0], user_data[1], user_data[2],
+                                                        user_data[3], user_data[4], t_now()))
+        conn.commit()
+        return f'Новый заказ оформлен\n<b>id-заказа: {order_id}</b>'
+    except Exception as e:
+        print('"db_w_orders"', e)
+        return '<b>Ошибка</b>\nПроверьте правильность введённых данных'
     finally:
         conn.close()
