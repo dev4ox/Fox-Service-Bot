@@ -90,14 +90,21 @@ def db_r_last(user_id: int, table: str):
 
 
 # История заказов пользователя return(max_page, [id, master, count])
-def user_history(user_id: int):
+def user_history(user_id: int, page: str):
     conn = sqlite3.connect(key.db)
     try:
-        # cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=? BETWEEN {1} AND {10}", (user_id,))
-        cursor = conn.execute(f"SELECT order_id, master, count FROM orders WHERE user_id=?", (user_id,))
+        page = int(page)
+        cursor = conn.cursor()
+        if page > 1:
+            offset = str(page - 1) + '0'
+        else:
+            offset = 0
+        cursor.execute(f"SELECT order_id, master, count FROM orders WHERE user_id = ? ORDER BY order_id LIMIT 10 "
+                       f"OFFSET ?", (user_id, offset))
         result = cursor.fetchall()
-        len_user_h = len(result)
-        result.insert(0, (len_user_h - 1) // 10 + 1)
+        cursor.execute("SELECT COUNT(*) FROM orders WHERE user_id=?", (user_id,))
+        total_records = cursor.fetchone()[0]
+        result.insert(0, (total_records - 1) // 10 + 1)
         return result
     except Exception as e:
         print('"user_history":', e)
@@ -120,6 +127,7 @@ def db_catalog_u():
         global len_catalog, page_max
         len_catalog = len(list_catalog)
         page_max = (len_catalog - 1) // 10 + 1
+        print(len_catalog, page_max)
         conn.execute('DELETE FROM catalog')
         for item_id, name, count in list_catalog:
             conn.execute("INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
@@ -136,16 +144,13 @@ def db_catalog_r(page: str):
     conn = sqlite3.connect(key.db)
     try:
         page = int(page)
-        result = []
-        cur = conn.cursor()
+        cursor = conn.cursor()
         if page > 1:
-            out_ids = [int(str(page - 1) + '1'), int(str(page) + '0')]
+            offset = str(page - 1) + '0'
         else:
-            out_ids = [1, 10]
-        cur.execute(f"SELECT item_id, name, count FROM catalog WHERE item_id BETWEEN {out_ids[0]} AND {out_ids[1]}")
-        rows = cur.fetchall()
-        for row in rows:
-            result.append(row)
+            offset = 0
+        cursor.execute(f"SELECT item_id, name, count FROM catalog ORDER BY item_id LIMIT 10 OFFSET ?", (offset,))
+        result = cursor.fetchall()
         return result
     except Exception as e:
         print('"catalog_r"', e)

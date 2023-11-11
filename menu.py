@@ -26,7 +26,9 @@ def order(page: int, max_page: int):
     button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.con_url)
     button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='u_order_' + str(page - 1))
     button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='u_order_' + str(page + 1))
-    if page <= 1:
+    if page == 1 == max_page:
+        markup.add(button_1, button_2)
+    elif page <= 1:
         markup.add(button_1, button_2, button_4)
     elif page >= max_page:
         markup.add(button_1, button_2, button_3)
@@ -52,7 +54,7 @@ def setting():
 
 def user_history(page: int, max_page: int):
     markup = types.InlineKeyboardMarkup(row_width=2)
-    button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='main')
+    button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='lk')
     button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.con_url)
     button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='user_history_' + str(page - 1))
     button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='user_history_' + str(page + 1))
@@ -77,7 +79,8 @@ def a_main():
     button_1 = types.InlineKeyboardButton('🔃  Обновить каталог', callback_data='a_updatecatalog_1')
     button_2 = types.InlineKeyboardButton('👥  Список пользователей', callback_data='a_userlist_1')
     button_3 = types.InlineKeyboardButton('➕  Записать заказ', callback_data='a_neworder_1')
-    markup.add(button_1, button_2, button_3)
+    button_4 = types.InlineKeyboardButton('📃  Заказы пользователя', callback_data='a_userhistory_1')
+    markup.add(button_1, button_2, button_3, button_4)
     return markup
 
 

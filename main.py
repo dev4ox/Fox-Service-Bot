@@ -29,6 +29,9 @@ if __name__ == '__main__':
                 if com_text == 'neworder':
                     answer = func.db_w_new_order(data_text)
                     bot.send_message(u_data[0], answer, parse_mode='html', reply_markup=menu.back_admin())
+                elif com_text == 'orderlist':
+                    h_page_max, *data = func.user_history(data_text[0], data_text[1])
+                    bot.send_message(u_data[0], text.user_history(data_text[1], h_page_max, data))
                 else:
                     bot.reply_to(message, 'Неизвестная команда')
 
@@ -67,9 +70,9 @@ if __name__ == '__main__':
                                       parse_mode='html', reply_markup=menu.setting())
             elif 'user_history' in call.data:
                 page = call.data.split('_')
-                page_max, *data = func.user_history(u_data[0])
-                bot.edit_message_text(text.user_history(page[2], page_max, data), u_data[0], u_data[1],
-                                      parse_mode='html', reply_markup=menu.user_history(int(page[2]), func.page_max))
+                h_page_max, *data = func.user_history(u_data[0], page[2])
+                bot.edit_message_text(text.user_history(page[2], h_page_max, data), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.user_history(int(page[2]), h_page_max))
             elif call.data == 'a_main' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.a_main.format(u_data[0]), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.a_main())
@@ -84,6 +87,9 @@ if __name__ == '__main__':
                 pass
             elif call.data == 'a_neworder_1' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.a_neworder_1, u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.back_admin())
+            elif call.data == 'a_userhistory_1' and u_data[0] == key.admin_id:
+                bot.edit_message_text(text.a_userhistory_1, u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.back_admin())
             else:
                 bot.edit_message_text(text.main, u_data[0], u_data[1],
