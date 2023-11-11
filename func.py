@@ -96,7 +96,8 @@ def user_history(user_id: int):
         # cursor = conn.execute(f"SELECT order_id, count FROM orders WHERE user_id=? BETWEEN {1} AND {10}", (user_id,))
         cursor = conn.execute(f"SELECT order_id, master, count FROM orders WHERE user_id=?", (user_id,))
         result = cursor.fetchall()
-        print(result)
+        len_user_h = len(result)
+        result.insert(0, (len_user_h - 1) // 10 + 1)
         return result
     except Exception as e:
         print('"user_history":', e)

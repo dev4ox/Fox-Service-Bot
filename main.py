@@ -28,7 +28,9 @@ if __name__ == '__main__':
                 com_text, *data_text = message.text.split('; ')
                 if com_text == 'neworder':
                     answer = func.db_w_new_order(data_text)
-                    bot.send_message(u_data[0], answer, reply_markup=menu.back_admin())
+                    bot.send_message(u_data[0], answer, parse_mode='html', reply_markup=menu.back_admin())
+                else:
+                    bot.reply_to(message, 'Неизвестная команда')
 
 
         @bot.callback_query_handler(func=lambda call: True)
@@ -39,7 +41,7 @@ if __name__ == '__main__':
                                       parse_mode='html', reply_markup=menu.main())
             elif 'u_order' in call.data:
                 page = call.data.split('_')
-                bot.edit_message_text(text.order(page[1], func.page_max, func.db_catalog_r(page[2])), u_data[0],
+                bot.edit_message_text(text.order(page[2], func.page_max, func.db_catalog_r(page[2])), u_data[0],
                                       u_data[1],
                                       parse_mode='html', reply_markup=menu.order(int(page[2]), func.page_max))
             elif call.data == 'lk':
@@ -65,11 +67,9 @@ if __name__ == '__main__':
                                       parse_mode='html', reply_markup=menu.setting())
             elif 'user_history' in call.data:
                 page = call.data.split('_')
-                user = func.db_r_one(u_data[0], [13, 12])
                 page_max, *data = func.user_history(u_data[0])
-                bot.edit_message_text(text.user_history(user[0], user[1], page[2], page_max, data),
-                                      u_data[0], u_data[1],
-                                      parse_mode='html', reply_markup=menu.user_history(int(page[1]), func.page_max))
+                bot.edit_message_text(text.user_history(page[2], page_max, data), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.user_history(int(page[2]), func.page_max))
             elif call.data == 'a_main' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.a_main.format(u_data[0]), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.a_main())

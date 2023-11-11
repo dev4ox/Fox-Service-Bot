@@ -74,14 +74,14 @@ setting = '''
 '''
 
 
-def user_history(l_name: str, f_name: str, page: str, page_max: str, list_history: list):
-    result = []
+def user_history(page: str, page_max: str, list_history: list):
+    result = [' id |  ФИО мастера  | Цена']
     for a, b, c in list_history:
         a = str(a)
         if len(a) < 2:
             a += '  '
         result.append(f'\n--------------------------------------------------------\n{a} | {b} | {c}')
-    return f'История заказов {l_name} {f_name}\nСтраница {page} из {page_max}{" ".join([i for i in result])}\n'
+    return f'История заказов | Страница {page} из {page_max}\n{" ".join([i for i in result])}\n'
 
 
 a_main = '''
