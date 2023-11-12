@@ -67,11 +67,15 @@ def user_history(page: int, max_page: int):
     return markup
 
 
-def back_admin():
+def back_admin(message_id: int, delmessage: bool = False):
     markup = types.InlineKeyboardMarkup(row_width=1)
-    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main')
+    if delmessage:
+        button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_' + str(message_id))
+    else:
+        button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
     markup.add(button_1)
     return markup
+
 
 
 def a_main():
@@ -86,7 +90,7 @@ def a_main():
 
 def a_updatecatalog_1():
     markup = types.InlineKeyboardMarkup(row_width=2)
-    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main')
+    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
     button_2 = types.InlineKeyboardButton('🔃  Обновить', callback_data='a_updatecatalog_2')
     markup.add(button_1, button_2)
     return markup
