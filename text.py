@@ -146,6 +146,7 @@ a_userhistory = '''
 <i>listorder; 123456; 1</i>
 '''
 
+
 def db_w_update_user_t(data):
     return f'''<b>Данные пользователя обновлены:</b>
     id       | {data[0]}
@@ -159,6 +160,7 @@ def db_w_update_user_t(data):
     Подписка | {data[8]}
     Заказов  | {data[9]}'''
 
+
 db_w_update_user_f = '''
 <b>Ошибка.</b> Проверьте правильность введённых данных
 
@@ -169,3 +171,10 @@ updateuser; user_id; username; first_name; last_name; phone; email
 Пример:
 <i>updateuser; 123456; ivanov; -; Иванов; +791234567890; -</i>
 '''
+
+
+def check_database(data):
+    result = ['<b>Проверка базы данных...</b>\n']
+    for i in data:
+        result.append(f'\n{i}')
+    return f'{" ".join([i for i in result])}'

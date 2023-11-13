@@ -7,9 +7,9 @@ import text
 bot = telebot.TeleBot(key.bot_token)
 if __name__ == '__main__':
     def bot_main():
-        @bot.message_handler(commands=['start', 'admin', 'sql', 'pay'])
+        @bot.message_handler(commands=['start', 'admin', 'sql'])
         def command_start(message):
-            u_data = [message.from_user.id, message.message_id, message.from_user.username]
+            u_data = [message.from_user.id, message.message_id - 1, message.from_user.username]
             if message.text == '/start':
                 func.first_join(u_data[0], u_data[2], message.text[6:])
                 bot.send_message(u_data[0], text.main,
@@ -17,6 +17,10 @@ if __name__ == '__main__':
             elif message.text == '/admin' and u_data[0] == key.admin_id:
                 bot.send_message(u_data[0], text.a_main.format(u_data[0]),
                                  parse_mode='html', reply_markup=menu.a_main())
+            elif message.text == '/sql' and u_data[0] == key.admin_id:
+                data = func.check_database()
+                bot.send_message(u_data[0], text.check_database(data),
+                                 parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
             else:
                 bot.send_message(u_data[0], text.main,
                                  parse_mode='html', reply_markup=menu.main())
@@ -44,7 +48,8 @@ if __name__ == '__main__':
                                          parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
 
                 else:
-                    bot.reply_to(message, 'Неизвестная команда')
+                    bot.send_message(u_data[0], 'Неизвестная команда',
+                                     parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
 
         @bot.callback_query_handler(func=lambda call: True)
         def callback_process(call):

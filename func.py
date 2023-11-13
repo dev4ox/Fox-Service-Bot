@@ -163,13 +163,14 @@ def db_catalog_r(page: str):
 def db_w_new_order(user_data: list):
     conn = sqlite3.connect(key.db)
     try:
-        cursor = conn.execute("SELECT num_orders FROM users WHERE user_id = ?", (user_data[0],))
-        conn.execute("UPDATE users SET num_orders = ? WHERE user_id = ?", (cursor.fetchone()[0], user_data[0]))
         cursor = conn.execute("SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
         order_id = cursor.fetchone()[0] + 1
         conn.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
                      "VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_data[0], user_data[1], user_data[2],
                                                       user_data[3], user_data[4], t_now()))
+        conn.commit()
+        cursor = conn.execute("SELECT COUNT(*) FROM orders WHERE user_id = ?", (user_data[0],))
+        conn.execute("UPDATE users SET num_orders = ? WHERE user_id = ?", (cursor.fetchone()[0], user_data[0]))
         conn.commit()
         return f'Новый заказ оформлен\n<b>id-заказа: {order_id}</b>'
     except Exception as e:
@@ -186,12 +187,11 @@ def db_w_update_user(data: list):
         len_data = len(data)
         if len_data != 6:
             raise ValueError("List out of range")
-        for i in range(len_data):
-            if data[i] == '-':
-                data[i] = ''
-        print(data)
-        cursor.execute("UPDATE users SET username = ?, first_name = ?, last_name = ?, phone = ?, email = ? "
-                       "WHERE user_id = ?", (data[1], data[2], data[3], data[4], data[5], data[0]))
+        data = [None if val == '-' else val for val in data]
+        sql_query = "UPDATE users SET username = COALESCE(?, username), first_name = COALESCE(?, first_name), " \
+                    "last_name = COALESCE(?, last_name), phone = COALESCE(?, phone), " \
+                    "email = COALESCE(?, email) WHERE user_id = ?"
+        cursor.execute(sql_query, (data[1], data[2], data[3], data[4], data[5], data[0]))
         conn.commit()
         cursor.execute(f"SELECT * FROM users WHERE user_id=?", (data[0],))
         result = cursor.fetchone()
@@ -223,3 +223,57 @@ def a_userlist(page: str):
     finally:
         conn.close()
 
+
+# Проверка базы данных
+def check_database():
+    # Подключение к базе данных (если её нет, она будет создана)
+    conn = sqlite3.connect(key.db)
+    cursor = conn.cursor()
+    result = []
+    try:
+        # Проверка наличия таблицы 'users'
+        cursor.execute("SELECT * FROM users")
+        result.append("Table 'users' exists.")
+        # Проверка наличия столбцов в таблице 'users'
+        cursor.execute("PRAGMA table_info(users)")
+        columns = cursor.fetchall()
+        required_columns = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code',
+                            'sub_pub', 'num_orders']
+        for column in required_columns:
+            if column not in [col[1] for col in columns]:
+                result.append(f"Column '{column}' is missing in 'users' table.")
+        # Проверка наличия таблицы 'orders'
+        cursor.execute("SELECT * FROM orders")
+        result.append("Table 'orders' exists.")
+        # Проверка наличия столбцов в таблице 'orders'
+        cursor.execute("PRAGMA table_info(orders)")
+        columns = cursor.fetchall()
+        required_columns = ['order_id', 'user_id', 'count', 'discount', 'master', 'order_list', 'order_date']
+        for column in required_columns:
+            if column not in [col[1] for col in columns]:
+                result.append(f"Column '{column}' is missing in 'orders' table.")
+        # Проверка наличия таблицы 'payments'
+        cursor.execute("SELECT * FROM payments")
+        result.append("Table 'payments' exists.")
+        # Проверка наличия столбцов в таблице 'payments'
+        cursor.execute("PRAGMA table_info(payments)")
+        columns = cursor.fetchall()
+        required_columns = ['order_id', 'user_id', 'count', 'pay_date', 'trans_id']
+        for column in required_columns:
+            if column not in [col[1] for col in columns]:
+                result.append(f"Column '{column}' is missing in 'payments' table.")
+        # Проверка наличия таблицы 'catalog'
+        cursor.execute("SELECT * FROM catalog")
+        result.append("Table 'catalog' exists.")
+        # Проверка наличия столбцов в таблице 'catalog'
+        cursor.execute("PRAGMA table_info(catalog)")
+        columns = cursor.fetchall()
+        required_columns = ['item_id', 'name', 'count']
+        for column in required_columns:
+            if column not in [col[1] for col in columns]:
+                result.append(f"Column '{column}' is missing in 'catalog' table.")
+        return ['Проверка базы данных успешно проведена']
+    except sqlite3.OperationalError:
+        return result
+    finally:
+        conn.close()
