@@ -3,6 +3,8 @@ import datetime
 import key
 import openpyxl
 
+import text
+
 KEY_REQUESTS = {
     10: ['users', 'user_id'],
     11: ['users', 'username'],
@@ -127,7 +129,6 @@ def db_catalog_u():
         global len_catalog, page_max
         len_catalog = len(list_catalog)
         page_max = (len_catalog - 1) // 10 + 1
-        print(len_catalog, page_max)
         conn.execute('DELETE FROM catalog')
         for item_id, name, count in list_catalog:
             conn.execute("INSERT INTO catalog (item_id, name, count) VALUES (?, ?, ?)", (item_id, name, count))
@@ -162,15 +163,63 @@ def db_catalog_r(page: str):
 def db_w_new_order(user_data: list):
     conn = sqlite3.connect(key.db)
     try:
+        cursor = conn.execute("SELECT num_orders FROM users WHERE user_id = ?", (user_data[0],))
+        conn.execute("UPDATE users SET num_orders = ? WHERE user_id = ?", (cursor.fetchone()[0], user_data[0]))
         cursor = conn.execute("SELECT * FROM orders ORDER BY order_id DESC LIMIT 1")
         order_id = cursor.fetchone()[0] + 1
-        cursor.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
-                       "VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_data[0], user_data[1], user_data[2],
-                                                        user_data[3], user_data[4], t_now()))
+        conn.execute("INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)", (order_id, user_data[0], user_data[1], user_data[2],
+                                                      user_data[3], user_data[4], t_now()))
         conn.commit()
         return f'Новый заказ оформлен\n<b>id-заказа: {order_id}</b>'
     except Exception as e:
         print('"db_w_orders"', e)
-        return '<b>Ошибка</b>\nПроверьте правильность введённых данных'
+        return '<b>Ошибка</b>\nПроверьте правильность введённых данных\n\n' + text.a_neworder
     finally:
         conn.close()
+
+
+def db_w_update_user(data: list):
+    conn = sqlite3.connect(key.db)
+    try:
+        cursor = conn.cursor()
+        len_data = len(data)
+        if len_data != 6:
+            raise ValueError("List out of range")
+        for i in range(len_data):
+            if data[i] == '-':
+                data[i] = ''
+        print(data)
+        cursor.execute("UPDATE users SET username = ?, first_name = ?, last_name = ?, phone = ?, email = ? "
+                       "WHERE user_id = ?", (data[1], data[2], data[3], data[4], data[5], data[0]))
+        conn.commit()
+        cursor.execute(f"SELECT * FROM users WHERE user_id=?", (data[0],))
+        result = cursor.fetchone()
+        return True, result
+    except Exception as e:
+        print('"db_w_update_user"', e)
+        return False, '0'
+    finally:
+        conn.close()
+
+
+def a_userlist(page: str):
+    conn = sqlite3.connect(key.db)
+    try:
+        page = int(page)
+        cursor = conn.cursor()
+        if page > 1:
+            offset = str(page - 1) + '0'
+        else:
+            offset = 0
+        cursor.execute(f"SELECT * FROM users ORDER BY user_id LIMIT 10 OFFSET ?", (offset,))
+        result = cursor.fetchall()
+        cursor.execute("SELECT COUNT(*) FROM users")
+        total_records = cursor.fetchone()[0]
+        result.insert(0, (total_records - 1) // 10 + 1)
+        return result
+    except Exception as e:
+        print('"a_userlist":', e)
+    finally:
+        conn.close()
+

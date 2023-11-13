@@ -38,8 +38,8 @@ info = '''
 name = input('Введите название для базы данных: ')
 if name == '':
     name = 'database'
+conn = sqlite3.connect(name + '.sqlite')
 try:
-    conn = sqlite3.connect(name + '.sqlite')
     cursor = conn.cursor()
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS users (
@@ -77,9 +77,9 @@ try:
     cursor.execute(f"INSERT INTO orders (order_id, user_id, count, discount, master, order_list, order_date) "
                    f"VALUES (?, ?, ?, ?, ?, ?, ?)", (0, 0, 0, 0, 0, 0, 0))
     conn.commit()
-    conn.close()
     print(info)
     print('База данных "' + name + '.sqlite" успешно создана')
 except Exception as e:
     print('Error create db\n', e)
+finally:
     conn.close()

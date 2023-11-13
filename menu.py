@@ -23,17 +23,17 @@ def lk():
 def order(page: int, max_page: int):
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='main')
-    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.con_url)
+    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.buy_url)
     button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='u_order_' + str(page - 1))
     button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='u_order_' + str(page + 1))
-    if page == 1 == max_page:
-        markup.add(button_1, button_2)
-    elif page <= 1:
+    if page <= 1 < max_page != 1:
         markup.add(button_1, button_2, button_4)
-    elif page >= max_page:
+    elif max_page <= page != 1:
         markup.add(button_1, button_2, button_3)
-    else:
+    elif 1 < page < max_page:
         markup.add(button_1, button_2, button_3, button_4)
+    else:
+        markup.add(button_1, button_2)
     return markup
 
 
@@ -55,18 +55,20 @@ def setting():
 def user_history(page: int, max_page: int):
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  Назад', callback_data='lk')
-    button_2 = types.InlineKeyboardButton('Заказать  🛒', url=key.con_url)
+    button_2 = types.InlineKeyboardButton('Поддержка  🆘', url=key.supp_url)
     button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='user_history_' + str(page - 1))
     button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='user_history_' + str(page + 1))
-    if page <= 1:
+    if page <= 1 < max_page != 1:
         markup.add(button_1, button_2, button_4)
-    elif page >= max_page:
+    elif max_page <= page != 1:
         markup.add(button_1, button_2, button_3)
-    else:
+    elif 1 < page < max_page:
         markup.add(button_1, button_2, button_3, button_4)
+    else:
+        markup.add(button_1, button_2)
     return markup
 
-
+# Если админ пишет текстовую команду, то бот удаляет своё предыдущее сообщение (сохраняется история сообщений)
 def back_admin(message_id: int, delmessage: bool = False):
     markup = types.InlineKeyboardMarkup(row_width=1)
     if delmessage:
@@ -88,7 +90,7 @@ def a_main():
     return markup
 
 
-def a_updatecatalog_1():
+def a_updatecatalog():
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
     button_2 = types.InlineKeyboardButton('🔃  Обновить', callback_data='a_updatecatalog_2')
@@ -96,3 +98,18 @@ def a_updatecatalog_1():
     return markup
 
 
+def a_userlist(page:int, max_page: int):
+    markup = types.InlineKeyboardMarkup(row_width=2)
+    button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
+    button_2 = types.InlineKeyboardButton('Смена данных  📝', callback_data='a_updateuser_1')
+    button_3 = types.InlineKeyboardButton('◀️  Пред. страница', callback_data='a_userlist_' + str(page - 1))
+    button_4 = types.InlineKeyboardButton('След. страница  ▶️', callback_data='a_userlist_' + str(page + 1))
+    if page <= 1 < max_page != 1:
+        markup.add(button_1, button_2, button_4)
+    elif max_page <= page != 1:
+        markup.add(button_1, button_2, button_3)
+    elif 1 < page < max_page:
+        markup.add(button_1, button_2, button_3, button_4)
+    else:
+        markup.add(button_1, button_2)
+    return markup

@@ -2,7 +2,8 @@ import func
 import key
 import text
 import menu
-table_users = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub']
+table_users = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub',
+               'num_orders']
 table_orders = ['order_id', 'user_id', 'count', 'discount', 'master', 'order_list', 'order_date']
 table_payments = ['order_id', 'user_id', 'count', 'pay_date', 'trans_id']
 table_catalog = ['item_id', 'name', 'count']

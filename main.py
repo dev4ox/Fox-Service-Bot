@@ -28,12 +28,21 @@ if __name__ == '__main__':
                 com_text, *data_text = message.text.split('; ')
                 if com_text == 'neworder':
                     answer = func.db_w_new_order(data_text)
-                    bot.edit_message_text(answer, u_data[0], u_data[1],
-                                          parse_mode='html', reply_markup=menu.back_admin(u_data[1] + 1, True))
+                    bot.send_message(u_data[0], answer,
+                                     parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
                 elif com_text == 'listorder':
                     h_page_max, *data = func.user_history(data_text[0], data_text[1])
-                    bot.edit_message_text(text.user_history(data_text[1], h_page_max, data), u_data[0], u_data[1],
-                                          parse_mode='html', reply_markup=menu.back_admin(u_data[1] + 1, True))
+                    bot.send_message(u_data[0], text.user_history(data_text[1], h_page_max, data),
+                                     parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
+                elif com_text == 'updateuser':
+                    data = func.db_w_update_user(data_text)
+                    if data[0]:
+                        bot.send_message(u_data[0], text.db_w_update_user_t(data[1]),
+                                         parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
+                    else:
+                        bot.send_message(u_data[0], text.db_w_update_user_f,
+                                         parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
+
                 else:
                     bot.reply_to(message, 'Неизвестная команда')
 
@@ -67,7 +76,7 @@ if __name__ == '__main__':
             elif call.data == 'setting':
                 user = func.db_r_one(u_data[0], [10, 11])
                 bot.send_message(key.ch_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
-                bot.edit_message_text(text.setting.format(key.con_url), u_data[0], u_data[1],
+                bot.edit_message_text(text.setting.format(key.supp_url), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.setting())
             elif 'user_history' in call.data:
                 page = call.data.split('_')
@@ -85,18 +94,24 @@ if __name__ == '__main__':
                                           parse_mode='html', reply_markup=menu.a_main())
             elif call.data == 'a_updatecatalog_1' and u_data[0] == key.admin_id:
                 bot.edit_message_text(text.a_updatecatalog_1.format(key.catalog), u_data[0], u_data[1],
-                                      parse_mode='html', reply_markup=menu.a_updatecatalog_1())
+                                      parse_mode='html', reply_markup=menu.a_updatecatalog())
             elif call.data == 'a_updatecatalog_2' and u_data[0] == key.admin_id:
                 data = func.db_catalog_u()
                 bot.edit_message_text(text.a_updatecatalog_2.format(data[0], data[1]), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.back_admin(u_data[1]))
-            elif call.data == 'a_userlist_1' and u_data[0] == key.admin_id:
-                pass
+            elif 'a_userlist' in call.data and u_data[0] == key.admin_id:
+                page = call.data.split('_')
+                h_page_max, *data = func.a_userlist(page[2])
+                bot.edit_message_text(text.a_userlist(page[2], h_page_max, data), u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.a_userlist(int(page[2]), h_page_max))
             elif call.data == 'a_neworder_1' and u_data[0] == key.admin_id:
-                bot.edit_message_text(text.a_neworder_1, u_data[0], u_data[1],
+                bot.edit_message_text(text.a_neworder, u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.back_admin(u_data[1]))
             elif call.data == 'a_userhistory_1' and u_data[0] == key.admin_id:
-                bot.edit_message_text(text.a_userhistory_1, u_data[0], u_data[1],
+                bot.edit_message_text(text.a_userhistory, u_data[0], u_data[1],
+                                      parse_mode='html', reply_markup=menu.back_admin(u_data[1]))
+            elif call.data == 'a_updateuser_1' and u_data[0] == key.admin_id:
+                bot.edit_message_text(text.a_updateuser, u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.back_admin(u_data[1]))
             else:
                 bot.edit_message_text(text.main, u_data[0], u_data[1],
