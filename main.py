@@ -135,8 +135,7 @@ if __name__ == '__main__':
             infinity_start(start_bot)
 
 
-    start_bot = 'y'
-    # start_bot = input(text.start_bot)
+    start_bot = input(text.start_bot)
     infinity_start(start_bot)
 else:
     print('Файл main.py создан для запуска')
