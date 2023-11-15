@@ -83,7 +83,7 @@ if __name__ == '__main__':
                                       parse_mode='html', reply_markup=menu.user_data())
             elif call.data == 'setting':
                 user = func.db_r_one(u_data[0], [10, 11])
-                bot.send_message(key.ch_order_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
+                bot.send_message(key.ch_moder_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
                 bot.edit_message_text(text.setting.format(key.supp_url), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.setting())
             elif 'user_history' in call.data:
