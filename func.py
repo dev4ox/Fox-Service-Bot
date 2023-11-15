@@ -55,6 +55,9 @@ def first_join(user_id, username, ref_code):
                 "sub_pub, num_orders) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (user_id, username, '-', '-', '-', '-', t_now(), ref_code, 0, 0))
             conn.commit()
+            return True
+        else:
+            return False
     except Exception as e:
         print('"first_join"', e)
     finally:

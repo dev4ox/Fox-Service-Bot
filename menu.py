@@ -68,6 +68,7 @@ def user_history(page: int, max_page: int):
         markup.add(button_1, button_2)
     return markup
 
+
 # Если админ пишет текстовую команду, то бот удаляет своё предыдущее сообщение (сохраняется история сообщений)
 def back_admin(message_id: int, delmessage: bool = False):
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -77,7 +78,6 @@ def back_admin(message_id: int, delmessage: bool = False):
         button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
     markup.add(button_1)
     return markup
-
 
 
 def a_main():
@@ -98,7 +98,7 @@ def a_updatecatalog():
     return markup
 
 
-def a_userlist(page:int, max_page: int):
+def a_userlist(page: int, max_page: int):
     markup = types.InlineKeyboardMarkup(row_width=2)
     button_1 = types.InlineKeyboardButton('⬅️  В админку', callback_data='a_main_0')
     button_2 = types.InlineKeyboardButton('Смена данных  📝', callback_data='a_updateuser_1')

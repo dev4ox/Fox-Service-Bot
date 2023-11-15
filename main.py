@@ -11,7 +11,9 @@ if __name__ == '__main__':
         def command_start(message):
             u_data = [message.from_user.id, message.message_id - 1, message.from_user.username]
             if message.text == '/start':
-                func.first_join(u_data[0], u_data[2], message.text[6:])
+                data = func.first_join(u_data[0], u_data[2], message.text[6:])
+                if data:
+                    bot.send_message(key.ch_moder_id, text.first_join.format(u_data[0], u_data[2]))
                 bot.send_message(u_data[0], text.main,
                                  parse_mode='html', reply_markup=menu.main())
             elif message.text == '/admin' and u_data[0] == key.admin_id:
@@ -46,7 +48,8 @@ if __name__ == '__main__':
                     else:
                         bot.send_message(u_data[0], text.db_w_update_user_f,
                                          parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
-
+                elif com_text == 'newpay':
+                    pass
                 else:
                     bot.send_message(u_data[0], 'Неизвестная команда',
                                      parse_mode='html', reply_markup=menu.back_admin(u_data[1], True))
@@ -80,7 +83,7 @@ if __name__ == '__main__':
                                       parse_mode='html', reply_markup=menu.user_data())
             elif call.data == 'setting':
                 user = func.db_r_one(u_data[0], [10, 11])
-                bot.send_message(key.ch_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
+                bot.send_message(key.ch_order_id, text.setting_ch.format(user[0], func.t_now(), user[1]))
                 bot.edit_message_text(text.setting.format(key.supp_url), u_data[0], u_data[1],
                                       parse_mode='html', reply_markup=menu.setting())
             elif 'user_history' in call.data:
@@ -125,17 +128,9 @@ if __name__ == '__main__':
         bot.polling(none_stop=True)
 
 
-    def infinity_start(start_bot: str):
-        try:
-            if start_bot.lower() != 'y':
-                quit()
-            bot_main()
-        except Exception as error:
-            print(error)
-            infinity_start(start_bot)
-
-
     start_bot = input(text.start_bot)
-    infinity_start(start_bot)
+    if start_bot.lower() == 'y':
+        bot_main()
+    quit()
 else:
     print('Файл main.py создан для запуска')
