@@ -1,7 +1,3 @@
-import func
-import key
-import text
-import menu
 table_users = ['user_id', 'username', 'first_name', 'last_name', 'phone', 'email', 'reg_date', 'ref_code', 'sub_pub',
                'num_orders']
 table_orders = ['order_id', 'user_id', 'count', 'discount', 'master', 'order_list', 'order_date']
@@ -264,17 +260,17 @@ call = {'id': '5673885123357213651',
                  'data': 'catalog'}}
 
 
-test_catalog = [[1, 'Тест название длиной в 26 символов !', 100],
-                [2, 'Установка ОС', 200],
-                [3, 'Чистка ПК от пыли', 300],
-                [4, 'r', 400],
-                [5, 't', 500],
-                [6, 'y', 600],
-                [7, 'u', 700],
-                [8, 'i', 800],
-                [9, 'o', 900],
-                [10, 'p', 1000]]
-len_catalog = len(test_catalog)
-
-page_max = (len_catalog - 1) // 10 + 1
-print(page_max)
+# test_catalog = [[1, 'Тест название длиной в 26 символов !', 100],
+#                 [2, 'Установка ОС', 200],
+#                 [3, 'Чистка ПК от пыли', 300],
+#                 [4, 'r', 400],
+#                 [5, 't', 500],
+#                 [6, 'y', 600],
+#                 [7, 'u', 700],
+#                 [8, 'i', 800],
+#                 [9, 'o', 900],
+#                 [10, 'p', 1000]]
+# len_catalog = len(test_catalog)
+#
+# page_max = (len_catalog - 1) // 10 + 1
+# print(page_max)
