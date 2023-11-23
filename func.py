@@ -33,6 +33,7 @@ KEY_REQUESTS = {
     42: ['catalog', 'count']
 }
 
+
 t_now = lambda: datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 len_catalog: int = 0
 page_max: int = 1

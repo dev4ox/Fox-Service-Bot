@@ -43,7 +43,7 @@ try:
     cursor = conn.cursor()
     cursor.execute('''
                     CREATE TABLE IF NOT EXISTS users (
-                        user_id INTEGER,
+                        user_id INTEGER PRIMARY KEY,
                         username TEXT,
                         first_name TEXT,
                         last_name TEXT,
